@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 # Вариант 18. Использовать словарь, содержащий следующие ключи: название товара; название
@@ -9,15 +8,8 @@
 # название которого введено с клавиатуры; если такого магазина нет, выдать на дисплей
 # соответствующее сообщение.
 
-# Для варианта задания лабораторной работы 8 необходимо дополнительно
-# реализовать сохранение и чтение данных из файла формата JSON. Необходимо проследить за
-# тем, чтобы файлы генерируемый этой программой не попадали в репозиторий лабораторной
-# работы.
-
-
 import sys
 import json
-import xml.etree.ElementTree as ET
 
 if __name__ == '__main__':
     # Список .
@@ -70,7 +62,7 @@ if __name__ == '__main__':
             )
             print(line)
 
-            # Вывести данные о всех товарах.
+            # Вывести данные о всех магазинах и товарах в них.
             for idx, markets in enumerate(market, 1):
                 print(
                     '| {:>4} | {:<30} | {:<20} | {:>20} |'.format(
@@ -85,12 +77,11 @@ if __name__ == '__main__':
 
         elif command.startswith('select '):
             parts = command.split(' ', maxsplit=2)
-            sel = (parts[1])
-
+            period = str(parts[1])
             count = 0
-            for markets in market:
-                if markets.get('shop') == sel:
 
+            for markets in market:
+                if markets.get('shop') == period:
                     count += 1
                     print(
                         '{:>4}: {}'.format(count, markets.get('shop', ''))
@@ -98,27 +89,23 @@ if __name__ == '__main__':
                     print('Название товара:', markets.get('product', ''))
                     print('Стоимость в руб.:', markets.get('price', ''))
 
-            # Если счетчик равен 0, то продукты не найдены.
+            # Если счетчик равен 0, то магазины не найдены.
             if count == 0:
-                print("Продукт не найден.")
+                print("Такого магазина нет!")
 
         elif command.startswith('load '):
+            # Разбить команду на части для выделения имени файла.
             parts = command.split(' ', maxsplit=1)
-
-            if 'xml' in parts[1]:
-                print('Загрузка')
-            elif 'json' in parts[1]:
-                with open(parts[1], 'r') as f:
-                    markets = json.load(f)
+            # Прочитать данные из файла JSON.
+            with open(parts[1], 'r') as f:
+                market = json.load(f)
 
         elif command.startswith('save '):
+            # Разбить команду на части для выделения имени файла.
             parts = command.split(' ', maxsplit=1)
-
-            if 'xml' in parts[1]:
-                print('Сохранение')
-            elif 'json' in parts[1]:
-                with open(parts[1], 'w')as f:
-                    json.dump(markets, f)
+            # Сохранить данные в файл JSON.
+            with open(parts[1], 'w') as f:
+                json.dump(market, f)
 
         elif command == 'help':
             # Вывести справку о работе с программой.
@@ -126,11 +113,8 @@ if __name__ == '__main__':
             print("add - добавить продукт;")
             print("list - вывести список продуктов;")
             print("select <товар> - информация о товаре;")
-            print("load <имя файла> - загрузить данные из файла;")
-            print("save <имя файла> - сохранить данные в файл;")
             print("help - отобразить справку;")
             print("exit - завершить работу с программой.")
 
         else:
             print(f"Неизвестная команда {command}", file=sys.stderr)
-            
